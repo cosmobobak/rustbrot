@@ -1,22 +1,17 @@
 mod filewrite;
 mod constants;
 mod colour_funcs;
+mod types;
 use constants::{WIDTH, HEIGHT, MAX_ITERATIONS};
 use num::complex::Complex;
 use rayon::prelude::*;
+use types::{Image, Window};
 
 use crate::filewrite::write_tga;
 
-struct Window {
-    left: f64,
-    right: f64,
-    top: f64,
-    bottom: f64,
-}
-
 fn compute_mandelbrot(
     window: Window,
-    output: &mut [[u32; WIDTH]; HEIGHT]
+    output: &mut Image
 ) {
     let Window { left, right, top, bottom } = window;
     output.par_iter_mut().enumerate().for_each(|(y, row)| {
@@ -52,6 +47,18 @@ fn compute_mandelbrot(
     });
 }
 
+fn fraction_black(image: &Image) -> f64 {
+    let mut black_pixels: usize = 0;
+    for row in image.iter() {
+        for pixel in row.iter() {
+            if *pixel == 0x000000 {
+                black_pixels += 1;
+            }
+        }
+    }
+    black_pixels as f64 / (WIDTH * HEIGHT) as f64
+}
+
 fn main() {
     println!("Please wait...");
     let mut image = Box::new([[0; WIDTH]; HEIGHT]);
@@ -66,7 +73,7 @@ fn main() {
         top: 1.125, 
         bottom: -1.125
     };
-    compute_mandelbrot(global_window, &mut image);
+    let window = global_window;
 
     // This zooms in on an interesting bit of detail.
     // let small_window = Window {
@@ -75,7 +82,9 @@ fn main() {
     //     top: 0.118378, 
     //     bottom: 0.134488
     // };
-    // compute_mandelbrot(small_window, &mut image);
+    // let window = small_window;
+    
+    compute_mandelbrot(window, &mut image);
 
     // Stop timing.
     let ms = start.elapsed().as_millis();
@@ -86,5 +95,12 @@ fn main() {
     write_tga("output.tga", &image);
 
     println!("Done.");
+
+    // Print the percentage of black pixels.
+    let frac = fraction_black(&image);
+    println!("{:.2}% of the image is black.", frac * 100.0);
+    let viewport_area = (window.right - window.left) * (window.top - window.bottom);
+    let black_area = frac * viewport_area;
+    println!("The area of the Mandelbrot set is {:.5}.", black_area);
 }
 
