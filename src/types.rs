@@ -1,5 +1,4 @@
-
-use crate::constants::{WIDTH, HEIGHT};
+use crate::constants::{HEIGHT, WIDTH};
 pub type Image = [[u32; WIDTH]; HEIGHT];
 
 #[derive(Debug, Clone, Copy)]

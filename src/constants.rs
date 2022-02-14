@@ -1,5 +1,3 @@
-
-
 // The size of the image to generate.
 const SCALEF: usize = 1;
 pub const WIDTH: usize = 1920 * SCALEF;

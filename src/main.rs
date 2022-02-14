@@ -1,37 +1,35 @@
-#![warn(
-    clippy::all,
-    clippy::pedantic,
-    clippy::nursery,
-)]
-
+#![warn(clippy::all, clippy::pedantic, clippy::nursery)]
 #![allow(clippy::cast_precision_loss)]
 #![allow(clippy::cast_sign_loss)]
 #![allow(clippy::cast_possible_truncation)]
 
-mod filewrite;
-mod constants;
 mod colour_funcs;
+mod constants;
+mod filewrite;
 mod types;
-use constants::{WIDTH, HEIGHT, MAX_ITERATIONS};
+use constants::{HEIGHT, MAX_ITERATIONS, WIDTH};
 use num::complex::Complex;
 use rayon::prelude::*;
 use types::{Image, Window};
 
 use crate::filewrite::write_tga;
 
-fn compute_mandelbrot(
-    window: Window,
-    output: &mut Image
-) {
-    let Window { left, right, top, bottom } = window;
+fn compute_mandelbrot(window: Window, output: &mut Image) {
+    let Window {
+        left,
+        right,
+        top,
+        bottom,
+    } = window;
     output.par_iter_mut().enumerate().for_each(|(y, row)| {
         for (x, pixel) in row.iter_mut().enumerate() {
             // Work out the point in the complex plane that
             // corresponds to this pixel in the output image.
             let c = Complex::new(
                 left + (x as f64 * (right - left) / WIDTH as f64),
-                top + (y as f64 * (bottom - top) / HEIGHT as f64));
-            
+                top + (y as f64 * (bottom - top) / HEIGHT as f64),
+            );
+
             let mut z = Complex::new(0.0, 0.0);
 
             // Iterate z = z^2 + c until z moves more than 2 units
@@ -58,12 +56,9 @@ fn compute_mandelbrot(
 }
 
 fn fraction_black(image: &Image) -> f64 {
-    let black_pixels =  image
+    let black_pixels = image
         .iter()
-        .map(|row| row
-            .iter()
-            .filter(|&&pixel| pixel == 0x00_00_00)
-            .count())
+        .map(|row| row.iter().filter(|&&pixel| pixel == 0x00_00_00).count())
         .sum::<usize>() as f64;
     black_pixels / (WIDTH * HEIGHT) as f64
 }
@@ -77,22 +72,22 @@ fn main() {
 
     // Compute the Mandelbrot set.
     let global_window = Window {
-        left: -2.0, 
-        right: 1.0, 
-        top: 1.125, 
-        bottom: -1.125
+        left: -2.0,
+        right: 1.0,
+        top: 1.125,
+        bottom: -1.125,
     };
     let window = global_window;
 
     // This zooms in on an interesting bit of detail.
     // let small_window = Window {
-    //     left: -0.751085, 
-    //     right: -0.734975, 
-    //     top: 0.118378, 
+    //     left: -0.751085,
+    //     right: -0.734975,
+    //     top: 0.118378,
     //     bottom: 0.134488
     // };
     // let window = small_window;
-    
+
     compute_mandelbrot(window, &mut image);
 
     // Stop timing.
@@ -112,4 +107,3 @@ fn main() {
     let black_area = frac * viewport_area;
     println!("The area of the Mandelbrot set is {:.5}.", black_area);
 }
-

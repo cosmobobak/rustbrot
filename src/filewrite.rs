@@ -1,7 +1,11 @@
-
-
-use std::{fs::File, io::{Write, BufWriter}};
-use crate::{constants::{WIDTH, HEIGHT}, types::Image};
+use crate::{
+    constants::{HEIGHT, WIDTH},
+    types::Image,
+};
+use std::{
+    fs::File,
+    io::{BufWriter, Write},
+};
 
 // Write the image to a TGA file with the given name.
 // Format specification: http://www.gamers.org/dEngine/quake3/TGA.txt
@@ -11,6 +15,7 @@ pub fn write_tga(filename: &str, image: &Image) {
     let mut writer = BufWriter::new(file);
 
     // Write the TGA header.
+    #[rustfmt::skip]
     let header: [u8; 18] = [
         0, // no image ID
         0, // no colour map
