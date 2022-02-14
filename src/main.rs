@@ -1,3 +1,13 @@
+#![warn(
+    clippy::all,
+    clippy::pedantic,
+    clippy::nursery,
+)]
+
+#![allow(clippy::cast_precision_loss)]
+#![allow(clippy::cast_sign_loss)]
+#![allow(clippy::cast_possible_truncation)]
+
 mod filewrite;
 mod constants;
 mod colour_funcs;
@@ -35,7 +45,7 @@ fn compute_mandelbrot(
             if iterations == MAX_ITERATIONS {
                 // z didn't escape from the circle.
                 // This point is in the Mandelbrot set.
-                *pixel = 0x000000;
+                *pixel = 0x00_00_00;
             } else {
                 // z escaped within less than MAX_ITERATIONS
                 // iterations. This point isn't in the set.
@@ -48,15 +58,14 @@ fn compute_mandelbrot(
 }
 
 fn fraction_black(image: &Image) -> f64 {
-    let mut black_pixels: usize = 0;
-    for row in image.iter() {
-        for pixel in row.iter() {
-            if *pixel == 0x000000 {
-                black_pixels += 1;
-            }
-        }
-    }
-    black_pixels as f64 / (WIDTH * HEIGHT) as f64
+    let black_pixels =  image
+        .iter()
+        .map(|row| row
+            .iter()
+            .filter(|&&pixel| pixel == 0x00_00_00)
+            .count())
+        .sum::<usize>() as f64;
+    black_pixels / (WIDTH * HEIGHT) as f64
 }
 
 fn main() {

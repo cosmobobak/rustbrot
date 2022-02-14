@@ -1,8 +1,8 @@
 use crate::constants::MAX_ITERATIONS;
 
 #[allow(dead_code)]
-pub fn crazy(iterations: usize) -> u32 {
-    0xFFFFFF - (iterations as u32 * 0xFFFFFF / MAX_ITERATIONS as u32)
+pub const fn crazy(iterations: usize) -> u32 {
+    0xFF_FF_FF - (iterations as u32 * 0xFF_FF_FF / MAX_ITERATIONS as u32)
 }
 
 #[allow(dead_code)]
@@ -19,7 +19,7 @@ pub fn log_greyscale(iterations: usize) -> u32 {
     let blue  = 255 - (scale_factor * 255.0) as u8;
     let green = 255 - (scale_factor * 255.0) as u8;
     let red   = 255 - (scale_factor * 255.0) as u8;
-    (blue as u32) << 16 | (green as u32) << 8 | (red as u32)
+    u32::from(blue) << 16 | u32::from(green) << 8 | u32::from(red)
 }
 
 #[allow(dead_code)]
@@ -33,18 +33,18 @@ pub fn log(iterations: usize) -> u32 {
     /* scale_factor is in 0..1 */
     let scale_factor = log_scaled / FLOAT_MAX_ITERATIONS.log2();
 
-    let leftr  = 0xb8 as f32;
-    let leftg = 0x4e as f32;
-    let leftb = 0x0b as f32;
+    let red_one  = 0xb8 as f32;
+    let green_one = 0x4e as f32;
+    let blue_one = 0x0b as f32;
 
-    let rightr  = 0x07 as f32;
-    let rightg = 0x20 as f32;
-    let rightb = 0xe3 as f32;
+    let red_two  = 0x07 as f32;
+    let green_two = 0x20 as f32;
+    let blue_two = 0xe3 as f32;
     
-    let red = leftr * (1.0 - scale_factor) + rightr * scale_factor;
-    let green = leftg * (1.0 - scale_factor) + rightg * scale_factor;
-    let blue = leftb * (1.0 - scale_factor) + rightb * scale_factor;
-    (blue as u32) << 16 | (green as u32) << 8 | (red as u32)
+    let red = red_one.mul_add(1.0 - scale_factor, red_two * scale_factor) as u8;
+    let green = green_one.mul_add(1.0 - scale_factor, green_two * scale_factor) as u8;
+    let blue = blue_one.mul_add(1.0 - scale_factor, blue_two * scale_factor) as u8;
+    u32::from(blue) << 16 | u32::from(green) << 8 | u32::from(red)
 }
 
 #[allow(dead_code)]
@@ -61,7 +61,7 @@ pub fn exp_greyscale(iterations: usize) -> u32 {
     let blue  = 255 - (scale_factor * 255.0) as u8;
     let green = 255 - (scale_factor * 255.0) as u8;
     let red   = 255 - (scale_factor * 255.0) as u8;
-    (blue as u32) << 16 | (green as u32) << 8 | (red as u32)
+    u32::from(blue) << 16 | u32::from(green) << 8 | u32::from(red)
 }
 
 #[allow(dead_code)]
@@ -87,11 +87,11 @@ pub fn edward(iterations: usize) -> u32 {
         let new_scalef = scale_factor * 2.0;
         255 - (new_scalef * 255.0) as u8
     };
-    (blue as u32) << 16 | (green as u32) << 8 | (red as u32)
+    u32::from(blue) << 16 | u32::from(green) << 8 | u32::from(red)
 }
 
 #[allow(dead_code)]
-pub fn wiki_modulo(iterations: usize) -> u32 {
+pub const fn wiki_modulo(iterations: usize) -> u32 {
     #[allow(clippy::identity_op)]
     const COLOURS: [u32; 16] = [
              66 | ( 30 << 8) | ( 15 << 16), // brown 3
