@@ -14,7 +14,7 @@ use types::{Image, Window};
 
 use crate::filewrite::write_tga;
 
-fn compute_mandelbrot(window: Window, output: &mut Image) {
+fn render_mandelbrot(window: Window, output: &mut Image) {
     let Window {
         left,
         right,
@@ -43,6 +43,7 @@ fn compute_mandelbrot(window: Window, output: &mut Image) {
             if iterations == MAX_ITERATIONS {
                 // z didn't escape from the circle.
                 // This point is in the Mandelbrot set.
+                // Colour it black.
                 *pixel = 0x00_00_00;
             } else {
                 // z escaped within less than MAX_ITERATIONS
@@ -88,7 +89,7 @@ fn main() {
     // };
     // let window = small_window;
 
-    compute_mandelbrot(window, &mut image);
+    render_mandelbrot(window, &mut image);
 
     // Stop timing.
     let ms = start.elapsed().as_millis();
