@@ -42,5 +42,7 @@ pub fn write_tga(filename: &str, image: &Image) {
         }
     }
 
+    writer.flush().unwrap();
+
     println!("Wrote {}", filename);
 }
