@@ -5,14 +5,13 @@
 
 mod colour_funcs;
 mod constants;
-mod filewrite;
+mod filehandling;
 mod types;
+
 use constants::{HEIGHT, MAX_ITERATIONS, WIDTH};
 use num::complex::Complex;
 use rayon::prelude::*;
 use types::{Image, Window};
-
-use crate::filewrite::write_tga;
 
 fn render_mandelbrot(window: Window, output: &mut Image) {
     let Window {
@@ -97,7 +96,7 @@ fn main() {
     println!("Computing the Mandelbrot set took {} ms.", ms);
 
     // Write the image to a TGA file.
-    write_tga("output.tga", &image);
+    filehandling::save_image_as_tga("output.tga", &image);
 
     println!("Done.");
 

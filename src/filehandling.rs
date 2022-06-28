@@ -9,7 +9,7 @@ use std::{
 
 // Write the image to a TGA file with the given name.
 // Format specification: http://www.gamers.org/dEngine/quake3/TGA.txt
-pub fn write_tga(filename: &str, image: &Image) {
+pub fn save_image_as_tga(filename: &str, image: &Image) {
     let file = File::create(filename).unwrap();
     // use a buffered writer
     let mut writer = BufWriter::new(file);
