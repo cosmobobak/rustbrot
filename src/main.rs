@@ -63,9 +63,21 @@ fn fraction_black(image: &Image) -> f64 {
     black_pixels / (WIDTH * HEIGHT) as f64
 }
 
+#[allow(clippy::unnecessary_box_returns)]
+fn allocate_image<const WIDTH: usize, const HEIGHT: usize>() -> Box<[[u32; WIDTH]; HEIGHT]> {
+    unsafe {
+        let layout = std::alloc::Layout::new::<[[u32; WIDTH]; HEIGHT]>();
+        let ptr = std::alloc::alloc_zeroed(layout);
+        if ptr.is_null() {
+            std::alloc::handle_alloc_error(layout);
+        }
+        Box::from_raw(ptr.cast())
+    }
+}
+
 fn main() {
     println!("Please wait...");
-    let mut image = Box::new([[0; WIDTH]; HEIGHT]);
+    let mut image: Box<[[u32; 1920]; 1200]> = allocate_image();
 
     // start timing
     let start = std::time::Instant::now();
@@ -93,7 +105,7 @@ fn main() {
     // Stop timing.
     let ms = start.elapsed().as_millis();
 
-    println!("Computing the Mandelbrot set took {} ms.", ms);
+    println!("Computing the Mandelbrot set took {ms} ms.");
 
     // Write the image to a TGA file.
     filehandling::save_image_as_tga("output.tga", &image);
@@ -105,5 +117,5 @@ fn main() {
     println!("{:.2}% of the image is black.", frac * 100.0);
     let viewport_area = (window.right - window.left) * (window.top - window.bottom);
     let black_area = frac * viewport_area;
-    println!("The area of the Mandelbrot set is {:.5}.", black_area);
+    println!("The area of the Mandelbrot set is {black_area:.5}.");
 }

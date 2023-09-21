@@ -31,8 +31,8 @@ pub fn save_image_as_tga(filename: &str, image: &Image) {
 
     writer.write_all(&header).unwrap();
 
-    for row in image.iter() {
-        for &loc in row.iter() {
+    for row in image {
+        for &loc in row {
             let pixel: [u8; 3] = [
                 (loc & 0xFF) as u8,
                 (loc >> 8 & 0xFF) as u8,
@@ -44,5 +44,5 @@ pub fn save_image_as_tga(filename: &str, image: &Image) {
 
     writer.flush().unwrap();
 
-    println!("Wrote {}", filename);
+    println!("Wrote {filename}");
 }
